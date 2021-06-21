@@ -132,28 +132,26 @@ class VeSyncHumidifierHA(VeSyncDevice, HumidifierEntity):
     def extra_state_attributes(self):
         """Return the state attributes of the humidifier."""
         attr = {}
-        attr["humidity"] = self.device.details["humidity"]
+        attr["current_humidity"] = self.device.details["humidity"]
         attr["mist_virtual_level"] = self.device.details["mist_virtual_level"]
         attr["mist_level"] = self.device.details["mist_level"]
-        attr["mode"] = self.device.details["mode"]
         attr["water_lacks"] = self.device.details["water_lacks"]
         attr["humidity_high"] = self.device.details["humidity_high"]
         attr["water_tank_lifted"] = self.device.details["water_tank_lifted"]
-        attr["display"] = self.device.details["display"]
         attr["automatic_stop_reach_target"] = self.device.details["automatic_stop_reach_target"]
-        attr["night_light_brightness"] = self.device.details["night_light_brightness"]
 
         return attr
 
     def set_mode(self, mode):
         """Set humidifier mode (auto, sleep, manual)."""
-        if mode.lower() not in (self.available_modes):
+        lower_mode = mode.lower()
+        if lower_mode not in (self.available_modes):
             raise ValueError(
                 f"Invalid mode value: {mode}  Valid values are {', '.join(self.available_modes)}."
             )
-        if "manual" in mode.lower():
+        if "manual" in lower_mode:
             level = 3
-            manual_mode = mode.lower().split()[1]
+            manual_mode = lower_mode.split()[1]
             if manual_mode == "low":
                 level = 3
             elif manual_mode == "mid":
@@ -162,12 +160,13 @@ class VeSyncHumidifierHA(VeSyncDevice, HumidifierEntity):
                 level = 9
             self.device.set_mist_level(level)
         else:
-            self.device.set_humidity_mode(mode.lower())
+            self.device.set_humidity_mode(lower_mode)
 
     def set_humidity(self, humidity):
         """Set the humidity level."""
         if not self.is_on:
             self.device.turn_on()
+        self.set_mode(MODE_AUTO)
         self.device.set_humidity(humidity)
 
 
