@@ -31,11 +31,11 @@ async def async_process_devices(hass, manager):
         for fan in manager.fans:
             if HUMI_DEV_TYPE_TO_HA.get(fan.device_type):
                 devices[VS_HUMIDIFIERS].append(fan)
-                devices[VS_SWITCHES].append(fan)
-                devices[VS_LIGHTS].append(fan)
+                #devices[VS_SWITCHES].append(fan)
+                #devices[VS_LIGHTS].append(fan)
                 humidifiers_count += 1
-                switches_count += 1
-                lights_count += 1
+                #switches_count += 1
+                #lights_count += 1
             else:
                 devices[VS_FANS].append(fan)
                 fans_count += 1
