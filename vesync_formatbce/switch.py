@@ -19,6 +19,7 @@ DEV_TYPE_TO_HA = {
     "ESWL03": "switch",
     "ESO15-TB": "outlet",
     "Classic300S": "humidifier_display",
+    "Dual200S": "humidifier_display",
 }
 
 
