@@ -29,7 +29,7 @@ FAN_MODE_SLEEP = "sleep"
 PRESET_MODES = {
     "LV-PUR131S": [FAN_MODE_AUTO, FAN_MODE_SLEEP],
     "Core200S": [FAN_MODE_SLEEP],
-    "Core300S": [FAN_MODE_SLEEP],
+    "Core300S": [FAN_MODE_AUTO, FAN_MODE_SLEEP],
     "Core400S": [FAN_MODE_AUTO, FAN_MODE_SLEEP],
 }
 SPEED_RANGE = (1, 3)  # off is not included
@@ -124,6 +124,9 @@ class VeSyncFanHA(VeSyncDevice, FanEntity):
 
         if hasattr(self.smartfan, "night_light"):
             attr["night_light"] = self.smartfan.night_light
+            
+        if hasattr(self.smartfan, "display_state"):
+            attr["display_state"] = self.smartfan.display_state
 
         if hasattr(self.smartfan, "air_quality"):
             attr["air_quality"] = self.smartfan.air_quality
