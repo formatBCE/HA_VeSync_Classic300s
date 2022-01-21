@@ -22,7 +22,7 @@ from .const import (
     VS_SWITCHES,
 )
 
-PLATFORMS = ["switch", "fan", "light", "humidifier"]
+PLATFORMS = ["switch", "fan", "light", "humidifier", "sensor"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -104,6 +104,7 @@ async def async_setup_entry(hass, config_entry):
     if device_dict[VS_HUMIDIFIERS]:
         humidifiers.extend(device_dict[VS_HUMIDIFIERS])
         hass.async_create_task(forward_setup(config_entry, "humidifier"))
+        hass.async_create_task(forward_setup(config_entry, "sensor"))
 
     if device_dict[VS_LIGHTS]:
         lights.extend(device_dict[VS_LIGHTS])
