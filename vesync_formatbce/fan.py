@@ -1,6 +1,7 @@
 """Support for VeSync fans."""
 import logging
 import math
+from typing import List
 
 from homeassistant.components.fan import SUPPORT_SET_SPEED, FanEntity
 from homeassistant.core import callback
@@ -11,7 +12,7 @@ from homeassistant.util.percentage import (
     ranged_value_to_percentage,
 )
 
-from .common import VeSyncDevice
+from .common import CoordinatedVeSyncDevice, ToggleVeSyncEntity
 from .const import DOMAIN, VS_DISCOVERY, VS_DISPATCHERS, VS_FANS
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 @callback
-def _async_setup_entities(devices, async_add_entities):
+def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_entities):
     """Check if device is online and add entity."""
     dev_list = []
     for dev in devices:
@@ -64,10 +65,10 @@ def _async_setup_entities(devices, async_add_entities):
     async_add_entities(dev_list, update_before_add=True)
 
 
-class VeSyncFanHA(VeSyncDevice, FanEntity):
+class VeSyncFanHA(ToggleVeSyncEntity, FanEntity):
     """Representation of a VeSync fan."""
 
-    def __init__(self, fan):
+    def __init__(self, fan: CoordinatedVeSyncDevice):
         """Initialize the VeSync fan device."""
         super().__init__(fan)
         self.smartfan = fan

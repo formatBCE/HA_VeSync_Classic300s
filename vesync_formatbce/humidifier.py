@@ -1,6 +1,7 @@
 """Support for VeSync humidifiers."""
 import logging
 import math
+from typing import List
 
 from homeassistant.components.humidifier import HumidifierEntity
 from homeassistant.components.humidifier.const import (
@@ -12,7 +13,7 @@ from homeassistant.components.humidifier.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .common import VeSyncDevice, HUMI_DEV_TYPE_TO_HA
+from .common import CoordinatedVeSyncDevice, ToggleVeSyncEntity, HUMI_DEV_TYPE_TO_HA
 from .const import DOMAIN, VS_DISCOVERY, VS_DISPATCHERS, VS_HUMIDIFIERS
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ PRESET_MODES = {
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the VeSync humidifier platform."""
 
-    async def async_discover(devices):
+    async def async_discover(devices: List[CoordinatedVeSyncDevice]):
         """Add new devices to platform."""
         _async_setup_entities(devices, async_add_entities)
 
@@ -41,7 +42,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 @callback
-def _async_setup_entities(devices, async_add_entities):
+def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_entities):
     """Check if device is online and add entity."""
     dev_list = []
     for dev in devices:
@@ -56,20 +57,8 @@ def _async_setup_entities(devices, async_add_entities):
     async_add_entities(dev_list, update_before_add=True)
 
 
-class VeSyncHumidifierHA(VeSyncDevice, HumidifierEntity):
+class VeSyncHumidifierHA(ToggleVeSyncEntity, HumidifierEntity):
     """Representation of a VeSync humidifier."""
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.unique_id)
-            },
-            "name": self.name,
-            "manufacturer": "Levoit",
-            "model": self.device.device_type,
-        }
 
     @property
     def is_on(self):

@@ -1,11 +1,12 @@
 """Support for VeSync switches."""
 import logging
+from typing import List
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .common import VeSyncDevice
+from .common import CoordinatedVeSyncDevice, ToggleVeSyncEntity
 from .const import DOMAIN, VS_DISCOVERY, VS_DISPATCHERS, VS_SWITCHES
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 @callback
-def _async_setup_entities(devices, async_add_entities):
+def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_entities):
     """Check if device is online and add entity."""
     dev_list = []
     for dev in devices:
@@ -59,7 +60,7 @@ def _async_setup_entities(devices, async_add_entities):
     async_add_entities(dev_list, update_before_add=True)
 
 
-class VeSyncBaseSwitch(VeSyncDevice, SwitchEntity):
+class VeSyncBaseSwitch(ToggleVeSyncEntity, SwitchEntity):
     """Base class for VeSync switch Device Representations."""
 
     def turn_on(self, **kwargs):
@@ -111,21 +112,9 @@ class VeSyncLightSwitch(VeSyncBaseSwitch, SwitchEntity):
         super().__init__(switch)
         self.switch = switch
 
-class VeSyncHumidifierDisplaySwitch(VeSyncDevice, SwitchEntity):
+class VeSyncHumidifierDisplaySwitch(ToggleVeSyncEntity, SwitchEntity):
     """Class for VeSync humidifier display switch Device Representations."""
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.unique_id)
-            },
-            "name": self.name,
-            "manufacturer": "Levoit",
-            "model": self.device.device_type,
-        }
-        
+       
     @property
     def name(self):
         return self.device.device_name + " (display)"

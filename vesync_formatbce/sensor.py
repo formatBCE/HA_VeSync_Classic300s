@@ -1,5 +1,6 @@
 """Support for VeSync Humidifier's sensors."""
 import logging
+from typing import List
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
@@ -7,7 +8,7 @@ from homeassistant.const import DEVICE_CLASS_HUMIDITY, PERCENTAGE
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .common import VeSyncDevice
+from .common import CoordinatedVeSyncDevice, ToggleVeSyncEntity, VeSyncEntity
 from .const import DOMAIN, VS_DISCOVERY, VS_DISPATCHERS, VS_HUMIDIFIERS
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 @callback
-def _async_setup_entities(devices, async_add_entities):
+def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_entities):
     """Check if device is online and add entity."""
     entities = []
     for dev in devices:
@@ -49,48 +50,7 @@ def _async_setup_entities(devices, async_add_entities):
     async_add_entities(entities, update_before_add=True)
 
 
-class VeSyncSensorHA:
-    """Base class for VeSync Device Representations."""
-
-    def __init__(self, device):
-        """Initialize the VeSync device."""
-        self.device = device
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self._device_id)
-            },
-            "name": self.device.device_name,
-            "manufacturer": "Levoit",
-            "model": self.device.device_type,
-        }
-
-    @property
-    def _device_id(self):
-        """Return the ID of this device."""
-        if isinstance(self.device.sub_device_no, int):
-            return f"{self.device.cid}{str(self.device.sub_device_no)}"
-        return self.device.cid
-
-    @property
-    def name(self):
-        """Return the name of the device."""
-        return self.device.device_name
-
-    @property
-    def available(self) -> bool:
-        """Return True if device is available."""
-        return self.device.connection_status == "online"
-
-    def update(self):
-        """Update vesync device."""
-        self.device.update()
-
-
-class VeSyncHumiditySensorHA(VeSyncSensorHA, SensorEntity):
+class VeSyncHumiditySensorHA(VeSyncEntity, SensorEntity):
     """Representation of a VeSync humidity sensor."""
 
     _attr_device_class = DEVICE_CLASS_HUMIDITY
@@ -128,7 +88,7 @@ class VeSyncHumiditySensorHA(VeSyncSensorHA, SensorEntity):
         return humidity
 
 
-class VeSyncHumidifierWaterLackSensor(VeSyncSensorHA, BinarySensorEntity):
+class VeSyncHumidifierWaterLackSensor(VeSyncEntity, BinarySensorEntity):
     """Representation of a VeSync Water Lack sensor."""
 
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
@@ -164,7 +124,7 @@ class VeSyncHumidifierWaterLackSensor(VeSyncSensorHA, BinarySensorEntity):
         return water_lacks
 
 
-class VeSyncHumidifierWaterTankSensor(VeSyncSensorHA, BinarySensorEntity):
+class VeSyncHumidifierWaterTankSensor(VeSyncEntity, BinarySensorEntity):
     """Representation of a VeSync Water Tank sensor."""
 
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
@@ -200,7 +160,7 @@ class VeSyncHumidifierWaterTankSensor(VeSyncSensorHA, BinarySensorEntity):
         return water_tank_lifted
 
 
-class VeSyncHumidifierHighHumiditySensor(VeSyncSensorHA, BinarySensorEntity):
+class VeSyncHumidifierHighHumiditySensor(VeSyncEntity, BinarySensorEntity):
     """Representation of a VeSync Water Tank sensor."""
 
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
