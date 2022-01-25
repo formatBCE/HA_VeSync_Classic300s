@@ -12,6 +12,11 @@ HUMI_DEV_TYPE_TO_HA = {
     "Dual200S": "humidifier",
 }
 
+HUMI_PROPS = {
+    "Classic300S": [VS_HUMIDIFIERS, VS_SWITCHES, VS_LIGHTS],
+    "Dual200S": [VS_HUMIDIFIERS, VS_SWITCHES],
+}
+
 
 async def async_process_devices(hass, manager):
     """Assign devices to proper component."""
@@ -30,13 +35,16 @@ async def async_process_devices(hass, manager):
     switches_count = 0
     if manager.fans:
         for fan in manager.fans:
-            if HUMI_DEV_TYPE_TO_HA.get(fan.device_type):
-                devices[VS_HUMIDIFIERS].append(fan)
-                devices[VS_SWITCHES].append(fan)
-                devices[VS_LIGHTS].append(fan)
-                humidifiers_count += 1
-                switches_count += 1
-                lights_count += 1
+            if HUMI_PROPS.get(fan.device_type):
+                if (VS_HUMIDIFIERS in HUMI_PROPS.get(fan.device_type)):
+                    devices[VS_HUMIDIFIERS].append(fan)
+                    humidifiers_count += 1
+                if (VS_SWITCHES in HUMI_PROPS.get(fan.device_type)):
+                    devices[VS_SWITCHES].append(fan)
+                    switches_count += 1
+                if (VS_LIGHTS in HUMI_PROPS.get(fan.device_type)):
+                    devices[VS_LIGHTS].append(fan)
+                    lights_count += 1
             else:
                 devices[VS_FANS].append(fan)
                 fans_count += 1
