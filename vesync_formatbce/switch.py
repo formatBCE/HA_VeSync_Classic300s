@@ -21,6 +21,8 @@ DEV_TYPE_TO_HA = {
     "ESO15-TB": "outlet",
     "Classic300S": "humidifier_display",
     "Dual200S": "humidifier_display",
+    "Dual301S": "humidifier_display",
+    "LUH-D301S-WEU": "humidifier_display",
 }
 
 
