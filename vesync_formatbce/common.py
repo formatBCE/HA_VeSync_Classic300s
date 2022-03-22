@@ -23,6 +23,11 @@ HUMI_DEV_TYPE_TO_HA = {
     "LUH-D301S-WEU": "humidifier",
 }
 
+HUMI_PROPS = {
+    "Classic300S": [VS_HUMIDIFIERS, VS_SWITCHES, VS_LIGHTS],
+    "Dual200S": [VS_HUMIDIFIERS, VS_SWITCHES],
+}
+
 
 class CoordinatedVeSyncDevice:
     """"Container wrapping VeSync device and attached DataUpdateCoordinator."""
@@ -72,13 +77,17 @@ async def async_process_devices(hass: HomeAssistant, manager: VeSync) -> Dict[st
     if manager.fans:
         for fan in manager.fans:
             coordinated_fan = CoordinatedVeSyncDevice(hass, fan)
-            if HUMI_DEV_TYPE_TO_HA.get(fan.device_type):
-                devices[VS_HUMIDIFIERS].append(coordinated_fan)
-                devices[VS_SWITCHES].append(coordinated_fan)
-                devices[VS_LIGHTS].append(coordinated_fan)
-                humidifiers_count += 1
-                switches_count += 1
-                lights_count += 1
+
+            if HUMI_PROPS.get(fan.device_type):
+                if (VS_HUMIDIFIERS in HUMI_PROPS.get(fan.device_type)):
+                    devices[VS_HUMIDIFIERS].append(coordinated_fan)
+                    humidifiers_count += 1
+                if (VS_SWITCHES in HUMI_PROPS.get(fan.device_type)):
+                    devices[VS_SWITCHES].append(coordinated_fan)
+                    switches_count += 1
+                if (VS_LIGHTS in HUMI_PROPS.get(fan.device_type)):
+                    devices[VS_LIGHTS].append(coordinated_fan)
+                    lights_count += 1
             else:
                 devices[VS_FANS].append(coordinated_fan)
                 fans_count += 1
