@@ -19,6 +19,8 @@ _LOGGER = logging.getLogger(__name__)
 HUMI_DEV_TYPE_TO_HA = {
     "Classic300S": "humidifier",
     "Dual200S": "humidifier",
+    "Dual301S": "humidifier",
+    "LUH-D301S-WEU": "humidifier",
 }
 
 

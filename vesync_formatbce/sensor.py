@@ -15,6 +15,9 @@ _LOGGER = logging.getLogger(__name__)
 
 DEV_TYPE_TO_HA = {
     "Classic300S": ("high-humidity-sensor", "humidity-sensor", "water-tank-sensor", "water-lack-sensor"),
+    "Dual301S": ("high-humidity-sensor", "humidity-sensor", "water-tank-sensor", "water-lack-sensor"),
+    "Dual200S": ("high-humidity-sensor", "humidity-sensor", "water-tank-sensor", "water-lack-sensor"),
+    "LUH-D301S-WEU": ("high-humidity-sensor", "humidity-sensor", "water-tank-sensor", "water-lack-sensor"),
 }
 
 
