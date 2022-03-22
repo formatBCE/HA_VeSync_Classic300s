@@ -1,5 +1,6 @@
 """VeSync integration."""
 import logging
+from typing import Dict, List
 
 from pyvesync import VeSync
 import voluptuous as vol
@@ -9,7 +10,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
-from .common import async_process_devices
+from .common import CoordinatedVeSyncDevice, async_process_devices
 from .const import (
     DOMAIN,
     SERVICE_UPDATE_DEVS,
@@ -22,7 +23,7 @@ from .const import (
     VS_SWITCHES,
 )
 
-PLATFORMS = ["switch", "fan", "light", "humidifier"]
+PLATFORMS = ["switch", "fan", "light", "humidifier", "sensor"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -104,6 +105,7 @@ async def async_setup_entry(hass, config_entry):
     if device_dict[VS_HUMIDIFIERS]:
         humidifiers.extend(device_dict[VS_HUMIDIFIERS])
         hass.async_create_task(forward_setup(config_entry, "humidifier"))
+        hass.async_create_task(forward_setup(config_entry, "sensor"))
 
     if device_dict[VS_LIGHTS]:
         lights.extend(device_dict[VS_LIGHTS])
@@ -112,10 +114,10 @@ async def async_setup_entry(hass, config_entry):
     async def async_new_device_discovery(service):
         """Discover if new devices should be added."""
         manager = hass.data[DOMAIN][VS_MANAGER]
-        switches = hass.data[DOMAIN][VS_SWITCHES]
-        fans = hass.data[DOMAIN][VS_FANS]
-        humidifiers = hass.data[DOMAIN][VS_HUMIDIFIERS]
-        lights = hass.data[DOMAIN][VS_LIGHTS]
+        switches: List[CoordinatedVeSyncDevice] = hass.data[DOMAIN][VS_SWITCHES]
+        fans: List[CoordinatedVeSyncDevice] = hass.data[DOMAIN][VS_FANS]
+        humidifiers: List[CoordinatedVeSyncDevice] = hass.data[DOMAIN][VS_HUMIDIFIERS]
+        lights: List[CoordinatedVeSyncDevice] = hass.data[DOMAIN][VS_LIGHTS]
 
         dev_dict = await async_process_devices(hass, manager)
         switch_devs = dev_dict.get(VS_SWITCHES, [])
@@ -152,6 +154,7 @@ async def async_setup_entry(hass, config_entry):
         if new_humidifiers and not humidifiers:
             humidifiers.extend(new_humidifiers)
             hass.async_create_task(forward_setup(config_entry, "humidifier"))
+            hass.async_create_task(forward_setup(config_entry, "sensor"))
 
         light_set = set(light_devs)
         new_lights = list(light_set.difference(lights))

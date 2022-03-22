@@ -1,5 +1,6 @@
 """Support for VeSync bulbs and wall dimmers."""
 import logging
+from typing import List
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -11,7 +12,7 @@ from homeassistant.components.light import (
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .common import VeSyncDevice
+from .common import CoordinatedVeSyncDevice, ToggleVeSyncEntity
 from .const import DOMAIN, VS_DISCOVERY, VS_DISPATCHERS, VS_LIGHTS
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 @callback
-def _async_setup_entities(devices, async_add_entities):
+def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_entities):
     """Check if device is online and add entity."""
     entities = []
     for dev in devices:
@@ -60,7 +61,7 @@ def _async_setup_entities(devices, async_add_entities):
     async_add_entities(entities, update_before_add=True)
 
 
-class VeSyncBaseLight(VeSyncDevice, LightEntity):
+class VeSyncBaseLight(ToggleVeSyncEntity, LightEntity):
     """Base class for VeSync Light Devices Representations."""
 
     @property
@@ -140,21 +141,9 @@ class VeSyncDimmableLightHA(VeSyncBaseLight, LightEntity):
         """Flag supported color_modes (in an array format)."""
         return [COLOR_MODE_BRIGHTNESS]
 
-class VeSyncHumidifierNightLightHA(VeSyncDevice, LightEntity):
+class VeSyncHumidifierNightLightHA(ToggleVeSyncEntity, LightEntity):
     """Representation of a VeSync humidifier night light device."""
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.unique_id)
-            },
-            "name": self.name,
-            "manufacturer": "Levoit",
-            "model": self.device.device_type,
-        }
-        
+       
     @property
     def name(self):
         """Name of light entity"""
