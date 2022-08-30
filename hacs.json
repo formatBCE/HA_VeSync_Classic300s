@@ -1,0 +1,6 @@
+{
+    "name": "VeSync-FormatBCE",
+    "country": "US",
+    "render_readme": false,
+    "domains": ["swtich","light","fan","humidifier"]
+}
