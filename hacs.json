@@ -1,0 +1,12 @@
+{
+    "name": "VeSync-FormatBCE",
+    "country": "US",
+    "render_readme": true,
+    "domains": [
+        "swtich",
+        "light",
+        "fan",
+        "humidifier"
+    ],
+    "homeassistant": "2022.10.0"
+}
