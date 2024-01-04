@@ -3,12 +3,14 @@ import logging
 import math
 from typing import List
 
-from homeassistant.components.humidifier import HumidifierEntity
+from homeassistant.components.humidifier import (
+    HumidifierEntity,
+    HumidifierDeviceClass,
+)
 from homeassistant.components.humidifier.const import (
-    DEVICE_CLASS_HUMIDIFIER,
     MODE_AUTO,
     MODE_SLEEP,
-    SUPPORT_MODES,
+    HumidifierEntityFeature,
 )
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -76,7 +78,7 @@ class VeSyncHumidifierHA(ToggleVeSyncEntity, HumidifierEntity):
     @property
     def device_class(self):
         """Return the device class type."""
-        return DEVICE_CLASS_HUMIDIFIER
+        return HumidifierDeviceClass.HUMIDIFIER
 
     @property
     def max_humidity(self):
@@ -92,7 +94,7 @@ class VeSyncHumidifierHA(ToggleVeSyncEntity, HumidifierEntity):
     @property
     def supported_features(self):
         """Flag supported features."""
-        return SUPPORT_MODES
+        return HumidifierEntityFeature.MODES
 
     @property
     def mode(self):
