@@ -3,8 +3,8 @@ import logging
 from typing import List
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
-from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
-from homeassistant.const import DEVICE_CLASS_HUMIDITY, PERCENTAGE
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass, SensorEntity
+from homeassistant.const import PERCENTAGE
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
@@ -56,8 +56,8 @@ def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_enti
 class VeSyncHumiditySensorHA(VeSyncEntity, SensorEntity):
     """Representation of a VeSync humidity sensor."""
 
-    _attr_device_class = DEVICE_CLASS_HUMIDITY
-    _attr_state_class = STATE_CLASS_MEASUREMENT
+    _attr_device_class = SensorDeviceClass.HUMIDITY
+    _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = PERCENTAGE
 
     @property
