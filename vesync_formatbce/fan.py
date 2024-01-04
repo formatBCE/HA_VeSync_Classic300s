@@ -3,7 +3,10 @@ import logging
 import math
 from typing import List
 
-from homeassistant.components.fan import SUPPORT_SET_SPEED, FanEntity
+from homeassistant.components.fan import (
+    FanEntity,
+    FanEntityFeature,
+)
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.percentage import (
@@ -68,15 +71,15 @@ def _async_setup_entities(devices: List[CoordinatedVeSyncDevice], async_add_enti
 class VeSyncFanHA(ToggleVeSyncEntity, FanEntity):
     """Representation of a VeSync fan."""
 
-    def __init__(self, fan: CoordinatedVeSyncDevice):
+    def __init__(self, wrapper: CoordinatedVeSyncDevice):
         """Initialize the VeSync fan device."""
-        super().__init__(fan)
-        self.smartfan = fan
+        super().__init__(wrapper)
+        self.smartfan = wrapper.device
 
     @property
     def supported_features(self):
         """Flag supported features."""
-        return SUPPORT_SET_SPEED
+        return FanEntityFeature.SET_SPEED | FanEntityFeature.PRESET_MODE
 
     @property
     def percentage(self):
