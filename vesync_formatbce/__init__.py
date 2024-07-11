@@ -82,8 +82,6 @@ async def async_setup_entry(hass, config_entry):
 
     device_dict = await async_process_devices(hass, manager)
 
-    forward_setup = hass.config_entries.async_forward_entry_setup
-
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][VS_MANAGER] = manager
 
@@ -96,20 +94,19 @@ async def async_setup_entry(hass, config_entry):
 
     if device_dict[VS_SWITCHES]:
         switches.extend(device_dict[VS_SWITCHES])
-        hass.async_create_task(forward_setup(config_entry, "switch"))
+        await hass.config_entries.async_forward_entry_setups(config_entry, ["switch"])
 
     if device_dict[VS_FANS]:
         fans.extend(device_dict[VS_FANS])
-        hass.async_create_task(forward_setup(config_entry, "fan"))
+        await hass.config_entries.async_forward_entry_setups(config_entry, ["fan"])
 
     if device_dict[VS_HUMIDIFIERS]:
         humidifiers.extend(device_dict[VS_HUMIDIFIERS])
-        hass.async_create_task(forward_setup(config_entry, "humidifier"))
-        hass.async_create_task(forward_setup(config_entry, "sensor"))
+        await hass.config_entries.async_forward_entry_setups(config_entry, ["sensor", "humidifier"])
 
     if device_dict[VS_LIGHTS]:
         lights.extend(device_dict[VS_LIGHTS])
-        hass.async_create_task(forward_setup(config_entry, "light"))
+        await hass.config_entries.async_forward_entry_setups(config_entry, ["light"])
 
     async def async_new_device_discovery(service):
         """Discover if new devices should be added."""
@@ -133,7 +130,7 @@ async def async_setup_entry(hass, config_entry):
             return
         if new_switches and not switches:
             switches.extend(new_switches)
-            hass.async_create_task(forward_setup(config_entry, "switch"))
+            await hass.config_entries.async_forward_entry_setups(config_entry, ["switch"])
 
         fan_set = set(fan_devs)
         new_fans = list(fan_set.difference(fans))
@@ -143,7 +140,7 @@ async def async_setup_entry(hass, config_entry):
             return
         if new_fans and not fans:
             fans.extend(new_fans)
-            hass.async_create_task(forward_setup(config_entry, "fan"))
+            await hass.config_entries.async_forward_entry_setups(config_entry, ["fan"])
 
         humidifier_set = set(humidifier_devs)
         new_humidifiers = list(humidifier_set.difference(humidifiers))
@@ -153,8 +150,7 @@ async def async_setup_entry(hass, config_entry):
             return
         if new_humidifiers and not humidifiers:
             humidifiers.extend(new_humidifiers)
-            hass.async_create_task(forward_setup(config_entry, "humidifier"))
-            hass.async_create_task(forward_setup(config_entry, "sensor"))
+            await hass.config_entries.async_forward_entry_setups(config_entry, ["sensor", "humidifier"])
 
         light_set = set(light_devs)
         new_lights = list(light_set.difference(lights))
@@ -164,7 +160,7 @@ async def async_setup_entry(hass, config_entry):
             return
         if new_lights and not lights:
             lights.extend(new_lights)
-            hass.async_create_task(forward_setup(config_entry, "light"))
+            await hass.config_entries.async_forward_entry_setups(config_entry, ["light"])
 
     hass.services.async_register(
         DOMAIN, SERVICE_UPDATE_DEVS, async_new_device_discovery
